@@ -1,8 +1,8 @@
 from django.contrib import admin
-from .models import Company, Listing, Sale
+from .models import CarCompany, SellCarListing, CarSaleRecord
 
 # Register your models here.
 
-admin.site.register(Company)
-admin.site.register(Listing)
-admin.site.register(Sale)
+admin.site.register(CarCompany)
+admin.site.register(SellCarListing)
+admin.site.register(CarSaleRecord)

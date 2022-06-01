@@ -41,9 +41,11 @@ Buy_Interested:
 
 
 --------- Doubts ----------
-login func for users
-Karan as super_user
+login func for users ------ yes
+Karan as super_user 
 5% commision added on the car price or deducted from the seller?
+company model or normal field
+
 
 
 

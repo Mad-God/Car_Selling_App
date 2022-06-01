@@ -1,0 +1,89 @@
+{% extends "base.html" %} {% load tailwind_filters %} {% block content %}
+{% load static %}
+<style>
+   body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+   }
+   * {
+      box-sizing: border-box;
+   }
+   .card {
+      color: white;
+      float: left;
+      width: calc(25% - 20px);
+      padding: 10px;
+      border-radius: 10px;
+      margin: 10px;
+      height: 300px;
+   }
+   .card p {
+      font-size: 18px;
+   }
+   .cardContainer:after {
+      content: "";
+      display: table;
+      clear: both;
+   }
+   @media screen and (max-width: 600px) {
+      .card {
+         width: 100%;
+      }
+   }
+</style>
+<section>
+
+{% comment %} Blog list Heading {% endcomment %}
+
+<div class="container jumbotron-container cardContainer grid">
+   <div>
+      {% for listing in listings %}
+            {% comment %} <a href = "{% url 'listing:update' slug=listing.slug %}"> {% endcomment %}
+               {% if listing.author == request.user %}
+                  <div class="card" style="background-color:rgb(15, 229, 22); height:500px" >   
+               {% else %}
+                  <div class="card" style="background-color:rgb(153, 29, 224); height:500px">
+               {% endif %}
+            {% if listing.picture %}
+                     
+               <img src = "{% static listing.picture %}" style="height:200px; width:400px" alt = "{{listing.picture}}">
+            {% else %}
+               <img src = "https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg" style="height:200px; width:400px">
+            {% endif %}
+            {% comment %} <a href = "{% url 'listing:detail' slug=listing.slug %}"> {% endcomment %}
+         <h1 class = "text-2xl hover:text-base">{{blog.title}}</h1>
+            {% comment %} </a> {% endcomment %}
+         <br>
+         <p> {{listing.body|safe|slice:":15" }}...</p>
+         <br>
+         <p class="text-right">by- {{listing.author}}</p>
+         {% if listing.last_updated %}
+               <p class="text-right"><i>edited- </i> {{listing.last_updated}}</p>
+         {% else %}
+               <p class="text-right"><i>created- </i> {{listing.created_on}}</p>
+         {% endif %}
+         <br>
+         
+         {% for cat in listing.category.all %}
+            {% comment %} <a href = "{% url 'listing:category-listing' slug=cat.slug %}"> {% endcomment %}
+               <span class="bg-blue-100 text-blue-800 text-sm font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-blue-200 dark:text-blue-800">{{cat}}</span>
+         
+            {% comment %} </a> {% endcomment %}
+            {% endfor %}
+            {% comment %} the delete button {% endcomment %}
+            {% if request.user.is_superuser %}
+               {% comment %} <a href = "{% url 'listing:listing-delete' slug=listing.slug %}"> {% endcomment %}
+                  <button class = "btn btn-primary btn-blue">Delete
+                     {% comment %} <span class="bg-red-100 text-blue-800 text-sm font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-red-200 dark:text-blue-800">Delete</span> {% endcomment %}
+                  </button>
+               {% comment %} </a> {% endcomment %}
+            
+            {% else %}
+            {% endif %}
+         </div>  
+         {% comment %} </a> {% endcomment %}
+         
+      {% endfor %}
+   </div>
+
+   
+{% endblock %}
