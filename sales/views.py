@@ -14,6 +14,7 @@ def car_listings(request):
 
 
 def sell(request):
+    errors = ""
     if request.method == "POST":
         form = SellCarForm(request.POST,request.FILES or None)
         if form.is_valid():
@@ -21,7 +22,16 @@ def sell(request):
             print(listing)
             return redirect("sales:home")
         else:
+            errors_dict = form.errors
+            # breakpoint()
+            for i,error in errors_dict.items():
+                errors += '"' + str(i) + '"'
+                errors = errors + " " +error[0]
+
             print("not valid")
             # breakpoint()
-    form = SellCarForm()
-    return render(request, "sales/sell.html", {"form":form})
+    form = SellCarForm()    
+    context = {"form":form}
+    if errors != "":
+        context["errors"] = errors
+    return render(request, "sales/sell.html", context)

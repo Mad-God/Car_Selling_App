@@ -35,55 +35,45 @@
 {% comment %} Blog list Heading {% endcomment %}
 
 <div class="container jumbotron-container cardContainer grid">
-   <div>
-      {% for listing in listings %}
-            {% comment %} <a href = "{% url 'listing:update' slug=listing.slug %}"> {% endcomment %}
-               {% if listing.author == request.user %}
-                  <div class="card" style="background-color:rgb(15, 229, 22); height:500px" >   
-               {% else %}
-                  <div class="card" style="background-color:rgb(153, 29, 224); height:500px">
-               {% endif %}
-            {% if listing.picture %}
-                     
-               <img src = "{% static listing.picture %}" style="height:200px; width:400px" alt = "{{listing.picture}}">
-            {% else %}
-               <img src = "https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg" style="height:200px; width:400px">
-            {% endif %}
-            {% comment %} <a href = "{% url 'listing:detail' slug=listing.slug %}"> {% endcomment %}
-         <h1 class = "text-2xl hover:text-base">{{blog.title}}</h1>
-            {% comment %} </a> {% endcomment %}
-         <br>
-         <p> {{listing.body|safe|slice:":15" }}...</p>
-         <br>
-         <p class="text-right">by- {{listing.author}}</p>
-         {% if listing.last_updated %}
-               <p class="text-right"><i>edited- </i> {{listing.last_updated}}</p>
-         {% else %}
-               <p class="text-right"><i>created- </i> {{listing.created_on}}</p>
-         {% endif %}
-         <br>
-         
-         {% for cat in listing.category.all %}
-            {% comment %} <a href = "{% url 'listing:category-listing' slug=cat.slug %}"> {% endcomment %}
-               <span class="bg-blue-100 text-blue-800 text-sm font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-blue-200 dark:text-blue-800">{{cat}}</span>
-         
-            {% comment %} </a> {% endcomment %}
-            {% endfor %}
-            {% comment %} the delete button {% endcomment %}
-            {% if request.user.is_superuser %}
-               {% comment %} <a href = "{% url 'listing:listing-delete' slug=listing.slug %}"> {% endcomment %}
-                  <button class = "btn btn-primary btn-blue">Delete
-                     {% comment %} <span class="bg-red-100 text-blue-800 text-sm font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-red-200 dark:text-blue-800">Delete</span> {% endcomment %}
-                  </button>
-               {% comment %} </a> {% endcomment %}
-            
-            {% else %}
-            {% endif %}
-         </div>  
-         {% comment %} </a> {% endcomment %}
-         
-      {% endfor %}
-   </div>
 
+
+   <div class = "width-100 px-4 mx-4 bg-gray-400 rounded px-4 py-40">
+      <table class="table-auto ">
+         <thead>
+           <tr>
+               <th class = "px-4 py-4">Picture</th>
+               <th class = "px-4 py-4">Model</th>
+               <th class = "px-4 py-4">Make</th>
+               <th class = "px-4 py-4">Year</th>
+               <th class = "px-4 py-4">Condition</th>
+               <th class = "px-4 py-4">Asking Price</th>
+               <th class = "px-4 py-4">Status</th>
+               
+           </tr>
+         </thead>
+         <tbody>
+            {% for listing in listings %}
+            
+            <tr>
+               {% if listing.picture %}
+               <td class = "px-4 py-4">
+                  <img src = "{% static listing.picture %}" width="190" height="190">
+               </td>
+               {% else %}
+               <td class = "px-4 py-4">
+                  <img src = "https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg" style="height:190px; width:190px">
+               </td>
+               {% endif %}
+               <td class = "px-4 py-4">{{listing.model_name}}</td>
+               <td class = "px-4 py-4">{{listing.make}}</td>
+               <td class = "px-4 py-4">{{listing.year}}</td>
+               <td class = "px-4 py-4">{{listing.condition}}</td>
+               <td class = "px-4 py-4">{{listing.price}}</td>
+               <td class = "px-4 py-4">Buy now</td>
+            </tr>
+         {% endfor %}
+         </tbody>
+       </table>
+   </div>
    
 {% endblock %}

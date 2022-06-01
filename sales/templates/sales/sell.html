@@ -1,6 +1,9 @@
 {% extends "base.html" %} {% load tailwind_filters %} {% block content %}
 <div class="max-w-lg mx-auto">
-  <form action="{% url 'sales:sell' %}" method="POST">
+    {% if errors %}
+    {{errors}}
+    {% endif %}
+  <form action="{% url 'sales:sell' %}" method="POST" enctype = "multipart/form-data">
     {% csrf_token %} {{ form|crispy }}
     <button
       class="w-full bg-blue-500 hover:bg-blue-600 px-3 py-1 rounded-md"
