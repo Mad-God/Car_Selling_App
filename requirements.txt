@@ -1,0 +1,6 @@
+pillow
+asgiref==3.5.0
+coverage==6.3.2
+crispy-tailwind==0.5.0
+Django==3.1.4
+django-crispy-forms==1.14.0
