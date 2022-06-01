@@ -38,15 +38,12 @@ Buy_Interested:
 
 
 
-just checkking if upstreamis working...
 
 
 --------- Doubts ----------
 login func for users
 Karan as super_user
 5% commision added on the car price or deducted from the seller?
-
-
 
 
 
