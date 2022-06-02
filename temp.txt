@@ -66,11 +66,13 @@ company model or normal field
     
     done: new user model
 
-    python type hinting
     environs
-    media dirs in settings
 
     story 2
 
-    
+    filtering code
+
+    clear filters
+
+
 
