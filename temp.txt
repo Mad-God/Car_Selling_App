@@ -62,14 +62,15 @@ company model or normal field
 
 ---------- 2 June --------------
 
-    form errors
+    done: form errors
+    
+    done: new user model
 
     python type hinting
-
     environs
+    media dirs in settings
 
     story 2
 
-    media dirs in settings
+    
 
-    new user model
