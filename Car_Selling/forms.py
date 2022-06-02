@@ -19,7 +19,7 @@ class CustomUserCreationForm(UserCreationForm):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.fields["mobile"] = forms.IntegerField(min_value = 1000000000, max_value = 9999999999)
-        breakpoint()
+        # breakpoint()
 
 
 class LoginForm(forms.ModelForm):

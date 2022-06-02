@@ -13,11 +13,8 @@ class SellCarForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(SellCarForm, self).__init__(*args, **kwargs)
-        years = [x for x in range(1950, 2023)]
-
-        self.fields["year"].widget = forms.SelectDateWidget(years=years)
         self.fields["price"] = forms.IntegerField(max_value = 100000, min_value = 1000)
-        self.fields["year"] = forms.IntegerField(max_value = 1000, min_value = 2023)
+        self.fields["year"] = forms.IntegerField(min_value = 1000, max_value = 2023)
         self.fields["condition"].choices = [
             ('Poor', 'poor'), ('Fair', 'fair'), ('Good', 'good'), ('Excellent', 'excellent')
         ]

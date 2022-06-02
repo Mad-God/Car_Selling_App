@@ -37,34 +37,39 @@
 <div class="container jumbotron-container cardContainer grid">
    <div class = "width-100 px-4 mx-4 bg-gray-400 rounded px-4 py-40">
       <div>
-
-         <button id="dropdownButton" data-dropdown-toggle="dropdown" 
-         class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" 
-         type="button">
-         {{current_category}}
-         <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-         </svg></button>
-
-         <!-- Dropdown menu -->
-         <div id="dropdown" class="hidden z-10 w-44 text-base list-none bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700">
-               <ul class="py-1" aria-labelledby="dropdownButton">
+         <form method = "GET">
+            <label for="years_id">Year:</label>
+            <select id="years_id" name="years">
+               <option value="" selected>All Years</option>
+               {% for year in years %}
                
-               <li>
-                  <a href="" class="block py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">All Items</a>
-               </li>
-               {% for cat in categories %}
-                  {% comment %} {% if cat.id == selected_cat %}
-                     <option selected value="{{cat}}">{{cat}}</option> {% endcomment %}
-                     <li>
-                     <a    ="" class="block py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">
-                        {{cat}}
-                     </a>
-                     </li>
-                  {% endfor %}
-               </ul>
+                  <option value="{{year}}">{{year}}</option>
+               {% endfor %}
+              
+            </select>
+
+            <label for="car_makers_id">Company:</label>
+            <select id="car_makers_id" name="car_makers">
+               <option value="" selected>All Companies</option>
+               {% for company in car_makers %}
+               
+                  <option value="{{company}}">{{company}}</option>
+               {% endfor %}
+              
+            </select>
+            
+            <button type = "submit">Filter<button>
          </div>
-      </div>
+       </div>
+         
+       </form>
+      
+      
+      
+      
+      
+      {% comment %} table contents {% endcomment %}
+      
       <table class="table-auto ">
          <thead>
            <tr>
