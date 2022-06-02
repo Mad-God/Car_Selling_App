@@ -7,11 +7,16 @@ from sales.models import CarInfo
 
 
 def car_listings(request):
-    return render(request, "sales/car_list2.html", {"listings":CarInfo.objects.all()})
+    # if request.method = GET:
 
+    years = CarInfo.objects.order_by().values('years').distinct()
+    makes = CarInfo.objects.order_by().values('make').distinct()
+    breakpoint()
+    return render(request, "sales/car_list.html", {"listings":CarInfo.objects.all(), "makes":makes, "years":years})
 
 
 def sell(request):
+
     if request.method == "POST":
         form = SellCarForm(request.POST,request.FILES or None)
         if form.is_valid():

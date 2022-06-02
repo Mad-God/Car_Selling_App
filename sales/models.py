@@ -72,7 +72,7 @@ class CarInfo(models.Model):
     condition = models.CharField(choices = condition_choices,max_length= 90)
     picture = models.ImageField(blank=True, null=True, upload_to = "blog/")
     price = models.IntegerField()
-    year = models.DateField()
+    year = models.IntegerField()
 
     sold = models.BooleanField(default = False)
 
