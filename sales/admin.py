@@ -1,7 +1,7 @@
 from django.contrib import admin
-from .models import SellCarListing, CarSaleRecord
+from .models import CarInfo, CarSaleRecord
 
 # Register your models here.
 
-admin.site.register(SellCarListing)
+admin.site.register(CarInfo)
 admin.site.register(CarSaleRecord)

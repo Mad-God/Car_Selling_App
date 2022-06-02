@@ -61,4 +61,15 @@ company model or normal field
 
 
 ---------- 2 June --------------
-    remove slug field
+
+    form errors
+
+    python type hinting
+
+    environs
+
+    story 2
+
+    media dirs in settings
+
+    new user model

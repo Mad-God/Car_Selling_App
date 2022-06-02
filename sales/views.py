@@ -1,15 +1,13 @@
 from django.shortcuts import render
 from .forms import SellCarForm
 from django.shortcuts import redirect
-from sales.models import SellCarListing
+from sales.models import CarInfo
 
 # Create your views here.
 
 
 def car_listings(request):
-    qs = SellCarListing.objects.all()
-
-    return render(request, "sales/car_list.html", {"listings":qs})
+    return render(request, "sales/car_list.html", {"listings":CarInfo.objects.all()})
 
 
 

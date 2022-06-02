@@ -1,5 +1,5 @@
 from django import forms
-from django.contrib.auth.models import User
+from sales.models import User
 from django.contrib.auth.forms import UserCreationForm
 
 
@@ -7,12 +7,11 @@ from django.contrib.auth.forms import UserCreationForm
 class CustomUserCreationForm(UserCreationForm):
     class Meta:
         model = User
-        fields = ("email", 'username', "password")
+        fields = ("username", "email", "mobile", "password")
     
-    
-    # def save(self, commit=True, **kwargs):
-    #     m = super(CustomUserCreationForm, self).save(commit=True)
-    #     return m
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.fields["mobile"] = forms.IntegerField(max_value = 1000000000, min_value = 9999999999)
 
 
 
