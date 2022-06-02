@@ -1,9 +1,62 @@
 from django.db import models
-
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 # Create your models here.
 
 
-class SellCarListing(models.Model):
+class CustomUserManager(BaseUserManager):
+
+    def create_superuser(self, password, **other_fields):
+        # in case these fields are not entered during creation
+        other_fields.setdefault('is_staff', True)
+        other_fields.setdefault('is_superuser', True)
+        other_fields.setdefault('is_active', True)
+
+
+
+        if other_fields.get('is_staff') is not True:
+            raise ValueError(
+                'Superuser must be assigned to is_staff=True.')
+        if other_fields.get('is_superuser') is not True:
+            raise ValueError(
+                'Superuser must be assigned to is_superuser=True.')
+
+
+        return self.create_user(password, **other_fields)
+
+
+    def create_user(self,password, **other_fields):
+
+        other_fields.setdefault('is_staff', False)
+        other_fields.setdefault('is_superuser', False)
+        other_fields.setdefault('is_active', True)
+
+        user = self.model(**other_fields)
+        user.set_password(password)
+        user.save()
+        return user
+
+
+
+
+
+class User(AbstractBaseUser, PermissionsMixin):
+    email = models.EmailField('email address')
+    username = models.CharField(max_length=40, unique=True)
+    name = models.CharField('first name', max_length=50)
+    mobile = models.BigIntegerField()
+
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False) 
+    is_superuser = models.BooleanField(default=False)
+    created = models.DateTimeField(auto_now_add= True)
+    updated = models.DateTimeField(auto_now= True)
+
+    objects =  CustomUserManager()
+
+    USERNAME_FIELD = "username"
+    REQUIRED_FIELDS = ["email", "name", 'mobile']
+
+class CarInfo(models.Model):
 
     condition_choices = (
         ('Poor', 'poor'),
@@ -12,8 +65,7 @@ class SellCarListing(models.Model):
         ("Excellent","excellent"),
     )
 
-    owner_name = models.CharField(max_length=100)
-    owner_mobile = models.BigIntegerField()
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
 
     make = models.CharField(max_length=50)
     model_name = models.CharField(max_length=20)
@@ -25,12 +77,12 @@ class SellCarListing(models.Model):
     sold = models.BooleanField(default = False)
 
     def __str__(self):
-        return self.model_name + " by: "+ str(self.make) +"- "+ str(self.owner_name)
+        return self.model_name + " by: "+ str(self.make) +"- "+ str(self.owner.name)
 
 
 
 class CarSaleRecord(models.Model):
-    listing = models.ForeignKey(SellCarListing, on_delete=models.CASCADE)
+    car_listing = models.ForeignKey(CarInfo, on_delete=models.CASCADE)
 
     name = models.CharField(max_length=100)
     mobile = models.BigIntegerField()
