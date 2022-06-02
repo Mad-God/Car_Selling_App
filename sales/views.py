@@ -26,8 +26,7 @@ def car_listings(request):
             listing_filtered_by_make = car_listing_queryset.filter(make=maker)
         if flag:
             car_listing_queryset = listing_filtered_by_make.union(listing_filtered_by_year)
-    # print(car_listing_queryset, q1, q2)
-    # breakpoint()
+            
     return render(request, "sales/car_list.html", {"listings":car_listing_queryset, "car_makers":car_makers, "years":years})
 
 
