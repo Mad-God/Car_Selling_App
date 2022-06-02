@@ -1,5 +1,5 @@
 from django import forms
-from .models import CarCompany, SellCarListing, CarSaleRecord
+from .models import SellCarListing, CarSaleRecord
 from django.contrib.auth.models import User
 from datetime import datetime
 

@@ -55,3 +55,10 @@ company model or normal field
     create repo for project
     multiple conditions in UserPassesTest Mixin
     done: push the last project's repo final time
+
+
+
+
+
+---------- 2 June --------------
+    remove slug field
