@@ -20,3 +20,5 @@ sales/migrations/
 Car_Selling/migrations/
 
 media/
+
+Car_Selling/.env
