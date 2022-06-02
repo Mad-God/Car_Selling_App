@@ -16,8 +16,7 @@ def sell(request):
     if request.method == "POST":
         form = SellCarForm(request.POST,request.FILES or None)
         if form.is_valid():
-            listing = form.save(commit=True)
-            print(listing)
+            form.save(commit=False, user = request.user)
             return redirect("sales:home")
         else:
             errors_dict = form.errors

@@ -7,12 +7,19 @@ from django.contrib.auth.forms import UserCreationForm
 class CustomUserCreationForm(UserCreationForm):
     class Meta:
         model = User
-        fields = ("username", "email", "mobile", "password")
+        fields = ("username", "email", "mobile")
+        error_messages = {
+                    'mobile': {
+                        'min_value':"This writer's name is too long.",
+                        'min_length':"This writer's name is too long.",
+                        'min':"This writer's name is too long.",
+                    },
+                }
     
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-        self.fields["mobile"] = forms.IntegerField(max_value = 1000000000, min_value = 9999999999)
-
+        self.fields["mobile"] = forms.IntegerField(min_value = 1000000000, max_value = 9999999999)
+        breakpoint()
 
 
 class LoginForm(forms.ModelForm):
