@@ -8,34 +8,17 @@ from .decorators import superuser_required, car_availability_required
 
 
 def car_listings(request):
-
     years = [x["year"] for x in CarInfo.objects.order_by().values('year').distinct()]
     car_makers = [x["make"] for x in CarInfo.objects.order_by().values('make').distinct()]
-
     car_listing_queryset = CarInfo.objects.all()
+
     if request.method == 'GET':
-        listing_filtered_by_year = CarInfo.objects.none() 
-        listing_filtered_by_make = CarInfo.objects.none()
-        flag = 0
-
-        filter_data = dict(request.GET)
-        if "years" in filter_data and request.GET["years"] != "":
-            flag = 1
-            year = request.GET["years"]
-            listing_filtered_by_year = car_listing_queryset.filter(year=year)
+        car_listing_queryset = car_listing_queryset.filter(make__icontains = request.GET.get('car_makers', ""))
+    
+        year = request.GET.get('years', "")
+        if year != "":
+            car_listing_queryset = car_listing_queryset.filter(year = year)
         
-        if "car_makers" in filter_data and request.GET["car_makers"] != "":
-            flag = 1
-            maker = request.GET["car_makers"]
-            listing_filtered_by_make = car_listing_queryset.filter(make=maker)
-        
-        if flag:
-            car_listing_queryset = listing_filtered_by_make.union(listing_filtered_by_year)
-
-
-        # car_listing_queryset = CarInfo.objects.filter(Q(year=year) | Q(make__icontains=car_maker))
-
-
     return render(request, "sales/car_list.html", {"listings":car_listing_queryset, "car_makers":car_makers, "years":years})
 
 
