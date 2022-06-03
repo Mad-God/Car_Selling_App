@@ -1,9 +1,9 @@
 from django.shortcuts import render
-from .forms import SellCarForm
+from .forms import BuyCarForm, SellCarForm
 from django.shortcuts import redirect
 from sales.models import CarInfo
 from django.contrib.auth.decorators import login_required
-
+from .decorators import superuser_required
 # Create your views here.
 
 
@@ -40,7 +40,7 @@ def car_listings(request):
 
 
 @login_required
-def sell(request):
+def sell_car(request):
     if request.method == "POST":
         form = SellCarForm(request.POST,request.FILES or None)
         if form.is_valid():
@@ -48,4 +48,22 @@ def sell(request):
             return redirect("sales:home")
     return render(request, "sales/sell.html", {"form":SellCarForm()})
 
+@login_required
+def buy_car(request, pk):
+    car_listing = CarInfo.objects.get(id=pk)
+    if request.method == "POST":
+        form = BuyCarForm(request.POST)
+        if form.is_valid():
+            form.save(commit=False, car_listing=car_listing)
+            # ssend mail here
+            return redirect("sales:home")
+    return render(request, "sales/buy.html", {"form":BuyCarForm(mobile=request.user.mobile, name=request.user.username), "car_listing":car_listing})
 
+
+@login_required
+@superuser_required
+def make_available(request, pk):
+    car_listing = CarInfo.objects.get(id=pk)
+    car_listing.sold=False
+    car_listing.save()
+    return redirect("sales:home")

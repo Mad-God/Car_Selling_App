@@ -84,7 +84,7 @@ class CarInfo(models.Model):
 
 
 class CarSaleRecord(models.Model):
-    car_listing = models.ForeignKey(CarInfo, on_delete=models.CASCADE)
+    car_listing = models.ForeignKey(CarInfo, on_delete=models.CASCADE, related_name="purchase")
 
     name = models.CharField(max_length=100)
     mobile = models.BigIntegerField()

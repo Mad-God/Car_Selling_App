@@ -52,7 +52,6 @@
             <select id="car_makers_id" name="car_makers"  style = "width:180px">
                <option value="" selected>All Companies</option>
                {% for company in car_makers %}
-               
                   <option value="{{company}}">{{company}}</option>
                {% endfor %}
               
@@ -103,7 +102,31 @@
                <td class = "px-4 py-4">{{listing.year}}</td>
                <td class = "px-4 py-4">{{listing.condition}}</td>
                <td class = "px-4 py-4">{{listing.price}}</td>
-               <td class = "px-4 py-4">Buy now</td>
+               <td class = "px-4 py-4">
+                  {% if listing.sold %}
+                     {% if request.user.is_superuser %}
+                        <button class="bg-indigo-500 px-3 py-2 rounded">
+                           <a href = "{% url "sales:make-available" pk=listing.id %}">
+                              Make Available
+                           </a>
+                        <button>
+                        {% if listing.purchase.first.mobile == request.user.mobile %}
+                           Applied for Purchase
+                        {% else %}
+                        {% endif %}
+                     {% elif listing.purchase.first.mobile == request.user.mobile %}
+                        Applied for Purchase
+                     {% else %}
+                     <span class = "font-red red text-red bg-red">Sold</span>
+                     {% endif %}
+                  {% else %}
+                  <button class="bg-green-500 px-3 py-2 rounded">
+                     <a href = "{% url "sales:buy" pk=listing.id %}">
+                        Buy now
+                     </a>
+                  </button>
+                  {% endif %}
+               </td>
             </tr>
          {% endfor %}
          </tbody>
