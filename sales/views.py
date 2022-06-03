@@ -2,6 +2,7 @@ from django.shortcuts import render
 from .forms import SellCarForm
 from django.shortcuts import redirect
 from sales.models import CarInfo
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 
@@ -13,7 +14,7 @@ def car_listings(request):
 
     car_listing_queryset = CarInfo.objects.all()
     if request.method == 'GET':
-        listing_filtered_by_year = CarInfo.objects.none()
+        listing_filtered_by_year = CarInfo.objects.none() 
         listing_filtered_by_make = CarInfo.objects.none()
         flag = 0
 
@@ -31,14 +32,20 @@ def car_listings(request):
         if flag:
             car_listing_queryset = listing_filtered_by_make.union(listing_filtered_by_year)
 
+
+        # car_listing_queryset = CarInfo.objects.filter(Q(year=year) | Q(make__icontains=car_maker))
+
+
     return render(request, "sales/car_list.html", {"listings":car_listing_queryset, "car_makers":car_makers, "years":years})
 
 
+@login_required
 def sell(request):
-
     if request.method == "POST":
         form = SellCarForm(request.POST,request.FILES or None)
         if form.is_valid():
             form.save(commit=False, user = request.user)
             return redirect("sales:home")
     return render(request, "sales/sell.html", {"form":SellCarForm()})
+
+

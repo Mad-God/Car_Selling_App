@@ -66,13 +66,27 @@ company model or normal field
     
     done: new user model
 
-    environs
+    done: environs
 
-    story 2
+    done: story 2
 
     filtering code
 
     clear filters
 
+--------- June 3 ----------
 
+    done: add email for login
 
+    done: add environ vairables, 
+     issue w databse name
+
+    buy car functionality
+
+    done: add KARAN superuser
+
+    email to karan on car buy
+
+    optimize filter code
+
+    improve filter UI

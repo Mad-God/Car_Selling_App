@@ -35,11 +35,11 @@
 {% comment %} Listing list Heading {% endcomment %}
 
 <div class="container jumbotron-container cardContainer grid">
-   <div class = "width-100 px-4 mx-4 bg-gray-400 rounded px-4 py-40">
+   <div class = "w-100 px-4 mx-4 bg-gray-400 rounded px-4 py-4">
       <div>
          <form method = "GET">
             <label for="years_id">Year:</label>
-            <select id="years_id" name="years">
+            <select id="years_id" name="years" style = "width:180px">
                <option value="" selected>All Years</option>
                {% for year in years %}
                
@@ -49,7 +49,7 @@
             </select>
 
             <label for="car_makers_id">Company:</label>
-            <select id="car_makers_id" name="car_makers">
+            <select id="car_makers_id" name="car_makers"  style = "width:180px">
                <option value="" selected>All Companies</option>
                {% for company in car_makers %}
                

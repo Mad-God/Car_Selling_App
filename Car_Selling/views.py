@@ -14,14 +14,11 @@ def index(request):
 
 
 def signup(request):
-    msg = ''
     form = CustomUserCreationForm
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
-            user = form.save()
-
-            msg = 'Form Submitted.'
+            form.save()
             return redirect("/login")
 
         else:
@@ -41,18 +38,11 @@ def login(request):
         password = request.POST.get("password")
         username = request.POST.get("username")
         user = None
-        print(email, password, username)
         user = auth.authenticate(email = email, password = password)
-        print(user)
-        user = auth.authenticate(username = username, password = password)
-        print(user)
-        # breakpoint()
         if user:
-            print("authenticated...")
             auth.login(request, user)
             return redirect("sales:home")
         else:
-            print("could not be authenticated...")
             messages.info(request, user)
             return redirect('login')
     else:
@@ -63,10 +53,3 @@ def login(request):
 def logout(request):
     auth.logout(request)
     return redirect("login")
-
-
-
-
-
-def profile_update(request):
-    pass

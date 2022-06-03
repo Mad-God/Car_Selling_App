@@ -6,7 +6,6 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseU
 class CustomUserManager(BaseUserManager):
 
     def create_superuser(self, password, **other_fields):
-        # in case these fields are not entered during creation
         other_fields.setdefault('is_staff', True)
         other_fields.setdefault('is_superuser', True)
         other_fields.setdefault('is_active', True)
@@ -40,7 +39,7 @@ class CustomUserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    email = models.EmailField('email address')
+    email = models.EmailField('email address', unique=True)
     username = models.CharField(max_length=40, unique=True)
     name = models.CharField('first name', max_length=50)
     mobile = models.BigIntegerField()
@@ -53,8 +52,11 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     objects =  CustomUserManager()
 
-    USERNAME_FIELD = "username"
-    REQUIRED_FIELDS = ["email", "name", 'mobile']
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = ["username", "name", 'mobile']
+
+
+
 
 class CarInfo(models.Model):
 
