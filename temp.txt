@@ -79,14 +79,16 @@ company model or normal field
     done: add email for login
 
     done: add environ vairables, 
-     issue w databse name
+     issue w databse name, mail creds
 
-    buy car functionality
+    done: buy car functionality
 
     done: add KARAN superuser
 
-    email to karan on car buy
+    done: email to karan on car buy
 
     optimize filter code
 
-    improve filter UI
+    done: add decorators
+
+    done: improve filter UI

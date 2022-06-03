@@ -3,7 +3,7 @@ from .forms import BuyCarForm, SellCarForm
 from django.shortcuts import redirect
 from sales.models import CarInfo
 from django.contrib.auth.decorators import login_required
-from .decorators import superuser_required
+from .decorators import superuser_required, car_availability_required
 # Create your views here.
 
 
@@ -49,6 +49,7 @@ def sell_car(request):
     return render(request, "sales/sell.html", {"form":SellCarForm()})
 
 @login_required
+@car_availability_required
 def buy_car(request, pk):
     car_listing = CarInfo.objects.get(id=pk)
     if request.method == "POST":
