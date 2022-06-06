@@ -14,7 +14,6 @@ from django.db.models import Sum
 def car_listings(request):
     years = [x["year"] for x in CarInfo.objects.order_by().values('year').distinct()]
     car_makers = [x["make"] for x in CarInfo.objects.order_by().values('make').distinct()]
-    finalised_records = CarInfo.objects.filter(purchase__finalised=True).order_by("-created_at")
     car_listing_queryset = CarInfo.objects.all().order_by("-created_at")
 
 
@@ -25,30 +24,34 @@ def car_listings(request):
         if year != "":
             car_listing_queryset = car_listing_queryset.filter(year = year)
     
+
     # get pending sales and profit records
-    sold_cars123 = CarSaleRecord.objects.filter(car_listing__sold=True, finalised=False)
-    pending_cars_num = sold_cars123.count()
-    pending_commission = sold_cars123.aggregate(Sum("car_listing__price"))['car_listing__price__sum'] or 0
-    print(sold_cars123)
-    print(pending_cars_num)
-    print(pending_commission)
+    pending_cars = CarSaleRecord.objects.filter(car_listing__sold=True, finalised=False)
+    pending_cars_num = pending_cars.count()
+    pending_commission = pending_cars.aggregate(Sum("car_listing__price"))['car_listing__price__sum'] or 0
 
 
     # get finalised sales and profit records
-    sold_cars123 = CarSaleRecord.objects.filter(finalised=True)
-    total_cars_num = sold_cars123.count() or 0
-    total_commission = sold_cars123.aggregate(Sum("car_listing__price"))['car_listing__price__sum'] or 0
-    print(sold_cars123)
-    print(total_cars_num)
-    print(total_commission)
+    sold_cars = CarSaleRecord.objects.filter(finalised=True)
+    total_cars_num = sold_cars.count() or 0
+    total_commission = sold_cars.aggregate(Sum("car_listing__price"))['car_listing__price__sum'] or 0
+
+
+
     # pagination
     p = Paginator(car_listing_queryset, 5)
     page = request.GET.get("page")
     qs = p.get_page(page)
+
+
+    context = {"listings":qs, "car_makers":car_makers,
+     "years":years, "pending_commission":pending_commission, 
+     "pending_cars_num":pending_cars_num, "total_commission":total_commission, 
+     "total_cars_num":total_cars_num}
+
+
     return render(request, "sales/car_list.html", 
-    {"listings":qs, "car_makers":car_makers, "years":years, "pending_commission":pending_commission, 
-    "pending_cars_num":pending_cars_num,"total_commission":total_commission, 
-    "total_cars_num":total_cars_num,"finalised_listings":finalised_records}
+    context
     )
 
 
@@ -96,3 +99,5 @@ def finalise_sale(request, pk):
     sale_record.finalised = True
     sale_record.save()
     return redirect("sales:home")
+
+

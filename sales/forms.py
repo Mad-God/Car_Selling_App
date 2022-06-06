@@ -40,16 +40,16 @@ class BuyCarForm(forms.ModelForm):
         car_listing.save()
         sale_record.save()
         # send mail here
-        mail_result = send_mail(
-            subject = f'A User has applied for buying the car: {str(car_listing)}',
-            message = f'''Customer: {sale_record.name} has requested to buy the car.:{str(car_listing)}
-            Your commission will be: $ {sale_record.commission}.
-            The buyer is: {sale_record.name} (phone: {sale_record.mobile})
-            ''',
-            from_email = 'satansin2001@gmail.com',
-            recipient_list = ['stmsng2001@gmail.com', 'karan@example.org'],
-            fail_silently=False,
-            )
+        # mail_result = send_mail(
+        #     subject = f'A User has applied for buying the car: {str(car_listing)}',
+        #     message = f'''Customer: {sale_record.name} has requested to buy the car.:{str(car_listing)}
+        #     Your commission will be: $ {sale_record.commission}.
+        #     The buyer is: {sale_record.name} (phone: {sale_record.mobile})
+        #     ''',
+        #     from_email = 'satansin2001@gmail.com',
+        #     recipient_list = ['stmsng2001@gmail.com', 'karan@example.org'],
+        #     fail_silently=False,
+        #     )
 
 
     def __init__(self, *args, **kwargs):
