@@ -30,7 +30,7 @@ class SellCarForm(forms.ModelForm):
 class BuyCarForm(forms.ModelForm):
     class Meta():
         model = CarSaleRecord
-        exclude = ("car_listing",)
+        exclude = ("car_listing","finalised",)
     
     def save(self, commit=False, *args, **kwargs):
         sale_record = super().save(commit)
@@ -43,11 +43,15 @@ class BuyCarForm(forms.ModelForm):
         mail_result = send_mail(
             subject = f'A User has applied for buying the car: {str(car_listing)}',
             message = f'''Customer: {sale_record.name} has requested to buy the car.:{str(car_listing)}
+            Your commission will be: $ {sale_record.commission}.
+            The buyer is: {sale_record.name} (phone: {sale_record.mobile})
             ''',
             from_email = 'satansin2001@gmail.com',
             recipient_list = ['stmsng2001@gmail.com', 'karan@example.org'],
             fail_silently=False,
             )
+
+
     def __init__(self, *args, **kwargs):
         mobile = kwargs.pop("mobile", "")
         name = kwargs.pop("name", "")

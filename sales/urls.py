@@ -12,4 +12,5 @@ urlpatterns = [
     path("sell", views.sell_car, name="sell"),
     path("buy/<int:pk>", views.buy_car, name="buy"),
     path("make-available/<int:pk>", views.make_available, name = "make-available"),
+    path("finalise-sale/<int:pk>", views.finalise_sale, name = "finalise-sale"),
 ]

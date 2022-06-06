@@ -87,8 +87,25 @@ company model or normal field
 
     done: email to karan on car buy
 
-    optimize filter code
+    done: optimize filter code
 
     done: add decorators
 
     done: improve filter UI
+
+
+--------------- 6 June ------------------
+
+    done: can't buy own car
+
+    done: pagination
+
+    done: update mail content: commission, buyer mobile, amount transferrable
+
+    done: commission field in sales record field
+
+    environment variables
+
+    done: get sales and profit figures for admin
+
+    

@@ -25,3 +25,14 @@ def car_availability_required(view_func):
         else:
             return HttpResponse("This car is no longer availble for sale.")
     return wrapper_func
+
+
+
+def not_own_car(view_func):
+    def wrapper_func(request, *args, **kwargs):
+        car_listing = CarInfo.objects.get(id=kwargs["pk"])
+        if not car_listing.owner == request.user:
+            return view_func(request, *args, **kwargs)
+        else:
+            return HttpResponse("This is your own car idiot.")
+    return wrapper_func    

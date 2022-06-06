@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
+
+# from sales.views import car_listings
 # Create your models here.
 
 
@@ -33,8 +35,6 @@ class CustomUserManager(BaseUserManager):
         user.set_password(password)
         user.save()
         return user
-
-
 
 
 
@@ -75,7 +75,7 @@ class CarInfo(models.Model):
     picture = models.ImageField(blank=True, null=True, upload_to = "blog/")
     price = models.IntegerField()
     year = models.IntegerField()
-
+    created_at = models.DateTimeField(auto_now_add=True)
     sold = models.BooleanField(default = False)
 
     def __str__(self):
@@ -83,8 +83,16 @@ class CarInfo(models.Model):
 
 
 
+
 class CarSaleRecord(models.Model):
     car_listing = models.ForeignKey(CarInfo, on_delete=models.CASCADE, related_name="purchase")
-
+    finalised = models.BooleanField(default = False)
     name = models.CharField(max_length=100)
     mobile = models.BigIntegerField()
+
+    def __str__(self):
+        return str(self.car_listing) + "sold to: " + self.name
+    
+    @property
+    def commission(self):
+        return self.car_listing.price * 0.05

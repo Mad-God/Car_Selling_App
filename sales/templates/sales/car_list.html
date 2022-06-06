@@ -35,8 +35,23 @@
 {% comment %} Listing list Heading {% endcomment %}
 
 <div class="container jumbotron-container cardContainer grid">
-   <div class = "w-100 px-4 mx-4 bg-gray-400 rounded px-4 py-4">
-      <div>
+   <div >
+      {% if request.user.is_superuser %}
+      <div class = "w-100 px-4 mx-4 rounded px-4 py-4">
+         <h1 class = "text-3xl font-bold font-red-400"> 
+            Pending Sales: {{pending_cars_num}}
+            <br>
+            Pending Commission: {{pending_commission}}
+         </h1>
+         <h1 class = "text-3xl font-bold font-red-400 float-right -m-20"> 
+            Total Sales: {{total_cars_num}}
+            <br>
+            Total Commission: {{total_commission}}
+         </h1>
+      </div>
+      {% else %}
+      {% endif %}
+      <div class = "w-100 px-4 mx-4 bg-gray-400 rounded px-4 py-4">
          <form method = "GET">
             <label for="years_id">Year:</label>
             <select id="years_id" name="years" style = "width:180px">
@@ -59,12 +74,12 @@
             
             <button type = "submit">Filter<button>
          </div>
-         <a href = "{% url "sales:home" %}">
-            <button>Clear Filter<button>
-         </a>
-       </div>
+            <a href = "{% url "sales:home" %}">
+               <button>Clear Filter<button>
+            </a>
+            </div>
          
-       </form>
+         </form>
       
       
       
@@ -86,51 +101,96 @@
          </thead>
          <tbody>
             {% for listing in listings %}
-            
-            <tr>
-               {% if listing.picture %}
-               <td class = "px-4 py-4">
-                  <img src = "{% static listing.picture %}" width="190" height="190">
-               </td>
-               {% else %}
-               <td class = "px-4 py-4">
-                  <img src = "https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg" style="height:190px; width:190px">
-               </td>
-               {% endif %}
-               <td class = "px-4 py-4">{{listing.model_name}}</td>
-               <td class = "px-4 py-4">{{listing.make}}</td>
-               <td class = "px-4 py-4">{{listing.year}}</td>
-               <td class = "px-4 py-4">{{listing.condition}}</td>
-               <td class = "px-4 py-4">{{listing.price}}</td>
-               <td class = "px-4 py-4">
-                  {% if listing.sold %}
-                     {% if request.user.is_superuser %}
-                        <button class="bg-indigo-500 px-3 py-2 rounded">
-                           <a href = "{% url "sales:make-available" pk=listing.id %}">
-                              Make Available
-                           </a>
-                        <button>
-                        {% if listing.purchase.first.mobile == request.user.mobile %}
+            {% if listing.purchase.last.finalised %}
+               <tr class= "bg-green-400">
+                  {% if listing.picture %}
+                  <td class = "px-4 py-4">
+                     <img src = "{% static listing.picture %}" width="190" height="190">
+                  </td>
+                  {% else %}
+                  <td class = "px-4 py-4">
+                     <img src = "https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg" style="height:190px; width:190px">
+                  </td>
+                  {% endif %}
+                  <td class = "px-4 py-4">{{listing.model_name}}</td>
+                  <td class = "px-4 py-4">{{listing.make}}</td>
+                  <td class = "px-4 py-4">{{listing.year}}</td>
+                  <td class = "px-4 py-4">{{listing.condition}}</td>
+                  <td class = "px-4 py-4">{{listing.price}}</td>
+                  <td class = "px-4 py-4"></td>
+                  <td class = "py-4"> Finalised sale for: {{listing.purchase.first.name}}</td>
+               </tr>
+            {% else %}
+               <tr>
+                  {% if listing.picture %}
+                  <td class = "px-4 py-4">
+                     <img src = "{% static listing.picture %}" width="190" height="190">
+                  </td>
+                  {% else %}
+                  <td class = "px-4 py-4">
+                     <img src = "https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg" style="height:190px; width:190px">
+                  </td>
+                  {% endif %}
+                  <td class = "px-4 py-4">{{listing.model_name}}</td>
+                  <td class = "px-4 py-4">{{listing.make}}</td>
+                  <td class = "px-4 py-4">{{listing.year}}</td>
+                  <td class = "px-4 py-4">{{listing.condition}}</td>
+                  <td class = "px-4 py-4">{{listing.price}}</td>
+                  <td class = "px-4 py-4">
+                     {% if listing.sold %}
+                        {% if request.user.is_superuser %}
+                           <button class="bg-indigo-500 px-3 py-2 rounded">
+                              <a href = "{% url "sales:make-available" pk=listing.id %}">
+                                 Make Available
+                              </a>
+                           <button>
+                           <button class="bg-indigo-500 px-3 py-2 rounded">
+                              <a href = "{% url "sales:finalise-sale" pk=listing.id %}">
+                                 Finalise
+                              </a>
+                           <button>
+                           {% if listing.purchase.first.mobile == request.user.mobile %}
+                              Applied for Purchase
+                           {% else %}
+                           {% endif %}
+                        {% elif listing.purchase.first.mobile == request.user.mobile %}
                            Applied for Purchase
                         {% else %}
+                        <span class = "font-red red text-red bg-red">Sold</span>
                         {% endif %}
-                     {% elif listing.purchase.first.mobile == request.user.mobile %}
-                        Applied for Purchase
+                     {% elif listing.owner == request.user %}
+                     <h1 class="bg-gray-100 px-3 py-2 text-md rounded">
+                        Own Car
+                     </h1>
                      {% else %}
-                     <span class = "font-red red text-red bg-red">Sold</span>
+                     <button class="bg-green-500 px-3 py-2 rounded">
+                        <a href = "{% url "sales:buy" pk=listing.id %}">
+                           Buy now
+                        </a>
+                     </button>
                      {% endif %}
-                  {% else %}
-                  <button class="bg-green-500 px-3 py-2 rounded">
-                     <a href = "{% url "sales:buy" pk=listing.id %}">
-                        Buy now
-                     </a>
-                  </button>
-                  {% endif %}
-               </td>
-            </tr>
+                  </td>
+               </tr>
+            {% endif %}
          {% endfor %}
          </tbody>
        </table>
+       
+  {% if listings.has_previous %}
+  <a href="?page=1"> &laquo First</a>
+
+  <a href="?page={{ listings.previous_page_number }}">Previous</a>
+  
+{% endif %}
+
+Page: {{listings.number}} of {{listings.paginator.num_pages}}
+
+{% if listings.has_next %}
+  <a href="?page={{ listings.next_page_number }}">Next</a>
+
+  <a href="?page={{ listings.paginator.num_pages }}">Last &raquo</a>
+
+{% endif %}
    </div>
    
 {% endblock %}
