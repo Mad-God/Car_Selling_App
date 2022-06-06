@@ -24,7 +24,8 @@ environ.Env.read_env()
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-SECRET_KEY = "y4hl+@(r_*z)kw*ahw&2c-^)r**r@y8^h*(!t+yb#00zt)5f(b"
+# SECRET_KEY = "y4hl+@(r_*z)kw*ahw&2c-^)r**r@y8^h*(!t+yb#00zt)5f(b"
+SECRET_KEY = env("SECRET_KEY")
 
 DEBUG = True
 
@@ -86,9 +87,9 @@ WSGI_APPLICATION = 'Car_Selling.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE':env("DATABASE_ENGINE"),
-        # 'NAME':BASE_DIR/env("DATABASE_NAME"),
+        'NAME':BASE_DIR/str(env("DATABASE_NAME"))
         # 'ENGINE':"django.db.backends.sqlite3",
-        'NAME': BASE_DIR / 'db.sqlite3',
+        # 'NAME': BASE_DIR / "db.sqlite3",
     }
 }
 
@@ -162,11 +163,4 @@ EMAIL_HOST = str(env("EMAIL_HOST"))
 EMAIL_HOST_USER = str(env("EMAIL_HOST_USER"))
 EMAIL_HOST_PASSWORD = str(env("EMAIL_HOST_PASSWORD"))
 EMAIL_BACKEND = str(env("EMAIL_BACKEND"))
-# breakpoint()
-# EMAIL_USE_TLS=True
-# EMAIL_PORT=587
-# EMAIL_HOST = "smtp.gmail.com"
-# EMAIL_HOST_USER = "stmsng2001@gmail.com"
-# EMAIL_HOST_PASSWORD = "brkgafmxnvlqmjbf"
-# EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 
