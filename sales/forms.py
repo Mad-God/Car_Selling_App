@@ -53,24 +53,24 @@ class BuyCarForm(forms.ModelForm):
         sale_record.save()
 
         # send mail here
-        # send_mail(
-        #     subject = f'A User has applied for buying the car: {str(car_listing)}',
-        #     message = f'''
-        #     Customer: {sale_record.name} has requested to buy the car: {str(car_listing.make)} model: {str(car_listing.model_name)} listed by: {str(car_listing.owner.username)} (phone: {str(car_listing.owner.mobile)} ).
+        send_mail(
+            subject = f'A User has applied for buying the car: {str(car_listing)}',
+            message = f'''
+            Customer: {sale_record.name} has requested to buy the car: {str(car_listing.make)} model: {str(car_listing.model_name)} listed by: {str(car_listing.owner.username)} (phone: {str(car_listing.owner.mobile)} ).
 
-        #     The asking price of the listed car is: {str(car_listing.price)}
+            The asking price of the listed car is: {str(car_listing.price)}
 
-        #     The buyer is: {sale_record.name} (phone: {sale_record.mobile}).
+            The buyer is: {sale_record.name} (phone: {sale_record.mobile}).
 
-        #     Your commission will be: $ {car_listing.commission} at the rate of {car_listing.commission_rate}.
+            Your commission will be: $ {car_listing.commission} at the rate of {car_listing.commission_rate}.
 
-        #     Net transferrable amount to the seller is: ${car_listing.price - car_listing.commission}
+            Net transferrable amount to the seller is: ${car_listing.price - car_listing.commission}
 
-        #     ''',
-        #     from_email = 'satansin2001@gmail.com',
-        #     recipient_list = ['stmsng2001@gmail.com', 'karan@example.org'],
-        #     fail_silently=False,
-        #     )
+            ''',
+            from_email = 'satansin2001@gmail.com',
+            recipient_list = ['stmsng2001@gmail.com', 'karan@example.org'],
+            fail_silently=False,
+            )
 
     def __init__(self, *args, **kwargs):
         """

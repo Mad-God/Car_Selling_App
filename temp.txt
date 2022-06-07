@@ -19,6 +19,8 @@ User Model:
     for karan
     admin_status
 
+
+
 Car_Listing Model:
     Owner name
     mobile
@@ -58,8 +60,6 @@ company model or normal field
 
 
 
-
-
 ---------- 2 June --------------
 
     done: form errors
@@ -73,6 +73,8 @@ company model or normal field
     filtering code
 
     clear filters
+
+
 
 --------- June 3 ----------
 
@@ -125,7 +127,7 @@ company model or normal field
 
     pep8 documentation
 
-    black command
+    done: black command
 
     done: clean code
 
@@ -135,7 +137,7 @@ company model or normal field
 
     done: docstring for the functions
 
-    uncomment mailing code
+    done: uncomment mailing code
 
     done: remove sold records from the car_list qs
 

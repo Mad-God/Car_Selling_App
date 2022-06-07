@@ -55,10 +55,6 @@ def car_listings(request):
         CarInfo.objects.filter(status="sold").aggregate(Sum("price"))["price__sum"] or 0
     )
 
-    # # getting sold records for admin
-    # if request.user.is_superuser:
-    #     sold_car_listing_queryset = CarInfo.objects.exclude(status="sold").order_by("-created_at")
-
     # pagination
     p = Paginator(car_listing_queryset, 5)
     page = request.GET.get("page")
