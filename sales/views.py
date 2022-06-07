@@ -28,9 +28,17 @@ def car_listings(request):
     car_makers = [
         x["make"] for x in CarInfo.objects.order_by().values("make").distinct()
     ]
-    car_listing_queryset = CarInfo.objects.exclude(status="sold").order_by(
-        "-created_at"
-    )
+
+
+    
+
+    # for getting the sold cars for admin view
+    if request.user.is_superuser:
+        car_listing_queryset = CarInfo.objects.all()
+    else:
+        car_listing_queryset = CarInfo.objects.exclude(status="sold").order_by(
+            "-created_at"
+        )
 
     # filtering
     if request.method == "GET":
@@ -54,6 +62,7 @@ def car_listings(request):
     total_commission = (
         CarInfo.objects.filter(status="sold").aggregate(Sum("price"))["price__sum"] or 0
     )
+
 
     # pagination
     p = Paginator(car_listing_queryset, 5)

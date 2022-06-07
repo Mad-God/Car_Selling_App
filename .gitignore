@@ -24,3 +24,7 @@ Car_Selling/migrations/
 media/
 
 Car_Selling/.env
+
+
+
+base/__pycache__/
