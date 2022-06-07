@@ -48,6 +48,7 @@ INSTALLED_APPS = [
 
     # custom apps
     "sales",
+    "base",
 ]
 
 MIDDLEWARE = [

@@ -108,4 +108,28 @@ company model or normal field
 
     done: get sales and profit figures for admin
 
-    
+
+
+--------------- 7 June ---------------------------
+
+    done: change model choice fields
+
+    cache on the aggregate functions
+
+    done: email contents
+
+    dynamic commissions
+
+    new app for login and signup
+
+    pep8 documentation
+
+    black command
+
+    clean code
+
+    use .update method for updating objects
+
+    use is_deletedfeild instead 
+
+    docstring for the functions

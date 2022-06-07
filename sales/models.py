@@ -67,6 +67,11 @@ class CarInfo(models.Model):
         ("Excellent","excellent"),
     )
 
+    status_choices = (
+        ('available', 'available'),
+        ("booked","booked"),
+        ("sold","sold"),
+    )
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
 
     make = models.CharField(max_length=50)
@@ -76,23 +81,24 @@ class CarInfo(models.Model):
     price = models.IntegerField()
     year = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
-    sold = models.BooleanField(default = False)
+    status = models.CharField(choices = status_choices,max_length= 90, default = "available")
 
     def __str__(self):
         return self.model_name + " by: "+ str(self.make) +"- "+ str(self.owner.name)
-
+    
 
 
 
 class CarSaleRecord(models.Model):
     car_listing = models.ForeignKey(CarInfo, on_delete=models.CASCADE, related_name="purchase")
-    finalised = models.BooleanField(default = False)
     name = models.CharField(max_length=100)
     mobile = models.BigIntegerField()
+    commission_rate = models.IntegerField(default=5)
+    denied = models.BooleanField(default =False)
 
     def __str__(self):
         return str(self.car_listing) + "sold to: " + self.name
     
     @property
     def commission(self):
-        return self.car_listing.price * 0.05
+        return round(self.car_listing.price * (self.commission_rate/100), 2)
