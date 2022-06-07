@@ -7,6 +7,8 @@ Car_Selling/forms.py
 Car_Selling/settings.py
 
 db.sqlite3
+temp.txt
+temp.py
 
 sales/__pycache__/
 sales/__pycache__/forms.cpython-37.pyc

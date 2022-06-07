@@ -115,7 +115,7 @@
             {% for listing in listings %}
             {% comment %} for sold cars {% endcomment %}
                {% if listing.status == "sold" %}
-                  <tr class= "bg-green-400">
+                  <tr class= "bg-green-400 mx-2">
                      {% if listing.picture %}
                      <td class = "px-4 py-4">
                         <img src = "{% static listing.picture %}" width="190" height="190">
@@ -131,7 +131,7 @@
                      <td class = "px-4 py-4">{{listing.condition}}</td>
                      <td class = "px-4 py-4">{{listing.price}}</td>
                      <td class = "px-4 py-4"></td>
-                     <td class = "py-4"> Finalised sale for: {{listing.purchase.first.name}}</td>
+                     <td class = "py-4"> Finalised sale for: {{listing.purchase.last.name}}</td>
                   </tr>
 
 
@@ -165,7 +165,7 @@
                                     Finalise
                                  </a>
                               <button>
-                              {% if listing.purchase.last.mobile == request.user.mobile %}
+                              {% if listing.purchase.last.mobile == request.user.mobile  %}
                                  Applied for Purchase
                               {% else %}
                               {% endif %}
@@ -192,6 +192,10 @@
          </tbody>
        </table>
        
+
+
+
+      {% comment %} Pagination {% endcomment %}
       {% if listings.has_previous %}
       <a href="?page=1"> &laquo First</a>
 

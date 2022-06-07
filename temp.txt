@@ -118,18 +118,25 @@ company model or normal field
 
     done: email contents
 
-    dynamic commissions
+    done: dynamic commissions
 
-    new app for login and signup
+    done: new app for login and signup
+     update the urls.py in the Project folder if possible
 
     pep8 documentation
 
     black command
 
-    clean code
+    done: clean code
 
-    use .update method for updating objects
+    done: use .update method for updating objects
 
-    use is_deletedfeild instead 
+    done: use is_deleted feild instead 
 
-    docstring for the functions
+    done: docstring for the functions
+
+    uncomment mailing code
+
+    done: remove sold records from the car_list qs
+
+    clean, optimize car_listing view 
