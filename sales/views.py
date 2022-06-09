@@ -163,7 +163,8 @@ class FinaliseSale(SuperUserRequiredMixin, View):
             return redirect("sales:home")
 
 
-class BuyCar(CarAvailabilityRequiredMixin, CreateView):
+
+class BuyCar(CarAvailabilityRequiredMixin, NotOwnCarMixin, CreateView):
     """
     Description:
     Used for BuyCar functionality. Takes name and number of interested party, creates a new car_sales_record
@@ -195,3 +196,5 @@ class BuyCar(CarAvailabilityRequiredMixin, CreateView):
             }
         )
         return context
+
+

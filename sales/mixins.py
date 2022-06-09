@@ -14,13 +14,13 @@ class SuperUserRequiredMixin(UserPassesTestMixin):
 
 
 
-
 class CarAvailabilityRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
     def test_func(self):
         return CarInfo.objects.get(id=self.kwargs["pk"]).status == "available"
 
     def handle_no_permission(self):
         return HttpResponse("This car is no longer available")
+
 
 
 class NotOwnCarMixin(LoginRequiredMixin, UserPassesTestMixin):
