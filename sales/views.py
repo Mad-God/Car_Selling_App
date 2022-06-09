@@ -8,11 +8,10 @@ from django.core.paginator import Paginator
 from django.db.models import Sum
 from django.http import HttpResponseRedirect
 from django.views import View
-from django.http import HttpResponse
-from django.views.generic import TemplateView, ListView, DetailView, CreateView, UpdateView, DeleteView, FormView
+from django.views.generic import ListView, CreateView
 from django.shortcuts import redirect, reverse
-from .mixins import SuperUserRequired
-from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin
+from .mixins import CarAvailabilityRequiredMixin, NotOwnCarMixin, SuperUserRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
 # Create your views here.
 
 
@@ -84,10 +83,20 @@ def car_listings(request):
         "total_cars_num": total_cars_num,
     }
 
-    # breakpoint()
     return render(request, "sales/car_list.html", context)
 
-class CarListing(ListView):
+class CarListing(LoginRequiredMixin, ListView):
+    """
+    Description:
+    shows all the car_info records to the page
+
+    # filtering data: gets the distinct values of years and car_makers over all the car_info records
+    # filtering: filters the record based on the given choices
+    # statistics: gets the number of records and total valuation for both sold and pending car_info records
+    # pagination: paginates the records 5 records at a time
+
+    """
+    
     template_name = 'sales/car_list.html'
     context_object_name = "listings"
 
@@ -95,7 +104,10 @@ class CarListing(ListView):
 
         # getting the initial queryset
         if self.request.user.is_superuser:
-            car_listing_queryset = CarInfo.objects.all()
+            car_listing_queryset = CarInfo.objects.all().order_by(
+                "-created_at"
+            )
+
         else:
             car_listing_queryset = CarInfo.objects.exclude(status="sold").order_by(
                 "-created_at"
@@ -119,9 +131,7 @@ class CarListing(ListView):
         return paginator.get_page(self.request.GET.get("page"))
 
     def get_context_data(self, **kwargs):
-        # filtering data
-
-        
+        # data for filtering 
         years = [x["year"] for x in CarInfo.objects.order_by().values("year").distinct()]
         car_makers = [
             x["make"] for x in CarInfo.objects.order_by().values("make").distinct()
@@ -155,7 +165,6 @@ class CarListing(ListView):
 
 
 
-
 @login_required
 def sell_car(request):
     """
@@ -169,8 +178,12 @@ def sell_car(request):
             return redirect("sales:home")
     return render(request, "sales/sell.html", {"form": SellCarForm()})
 
-class SellCar(LoginRequiredMixin, UserPassesTestMixin, CreateView):
 
+class SellCar(LoginRequiredMixin, CreateView):
+    """
+    Description: shows the form and submits the data for creating a car_info record
+    passes the current user to forms save methods to be referenced by the new car_info record
+    """
     template_name = 'sales/sell.html'
     form_class = SellCarForm
     def get_success_url(self):
@@ -179,9 +192,6 @@ class SellCar(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     def form_valid(self, form):
         form.save(commit=False, user=self.request.user)
         return HttpResponseRedirect(self.get_success_url())
-
-
-
 
 
 
@@ -197,28 +207,26 @@ def make_available(request, pk):
     CarSaleRecord.objects.filter(car_listing__id=pk).update(denied=True)
     return redirect("sales:home")
 
-class MakeAvailable(View):
+class MakeAvailable(SuperUserRequiredMixin, View):
+    """
+    Description:
+    sets the car_info record's status as "available" so that new reuqests can be made on this car_info record
+    and the sale_record record as denied
+    """
     def dispatch(self, *args, **kwargs,):
         """
         Description:
         sets the car_info record's status as "available" so that new reuqests can be made on this car_info record
         and the sale_record record as denied
         """
-        breakpoint()
-        CarInfo.objects.filter(id=self.kwargs["pk"]).update(status="available")
-        CarSaleRecord.objects.filter(car_listing__id=self.kwargs["pk"]).update(denied=True)
-        return redirect("sales:home")
+        print("inside: dispatch of makeAvaliable")
+        try:
+            return super().dispatch(self, args, kwargs)
+        except:
+            CarInfo.objects.filter(id=self.kwargs["pk"]).update(status="available")
+            CarSaleRecord.objects.filter(car_listing__id=self.kwargs["pk"]).update(denied=True)
 
-    def test_func(self):
-        breakpoint()
-        return self.request.user.is_superuser
-
-    def handle_no_permission(self):
-        breakpoint()
-        return HttpResponse("You are not a super user. Please login as one to make cars available")
-
-
-
+            return redirect("sales:home")
 
 
 
@@ -233,17 +241,18 @@ def finalise_sale(request, pk):
     CarInfo.objects.filter(id=pk).update(status="sold")
     return redirect("sales:home")
 
-class FinaliseSale(View):
+class FinaliseSale(SuperUserRequiredMixin, View):
+    """
+    sets the car_info record's status as sold so that no new requests can be made for it and
+    the profits can be added to the site for admin.
+    """
     def dispatch(self, *args, **kwargs,):
-        """
-        sets the car_info record's status as sold so that no new requests can be made for it and
-        the profits can be added to the site for admin
-        """
-        CarInfo.objects.filter(id=self.kwargs["pk"]).update(status="sold")
-        print("in the dispatch method")
-        return redirect("sales:home")
-
-
+        try:
+            return super().dispatch(self, args, kwargs)
+        except:
+            CarInfo.objects.filter(id=self.kwargs["pk"]).update(status="sold")
+            print("inside: dispatch of finalise")
+            return redirect("sales:home")
 
 
 
@@ -276,7 +285,7 @@ def buy_car(request, pk):
         },
     )
 
-class BuyCar(UpdateView):
+class BuyCar(CarAvailabilityRequiredMixin, CreateView):
     """
         Description:
         Used for BuyCar functionality. Takes name and number of interested party, creates a new car_sales_record
@@ -291,10 +300,6 @@ class BuyCar(UpdateView):
 
     def get_success_url(self):
         return reverse('sales:home')
-
-    def get_queryset(self):
-        queryset =CarInfo.objects.filter(id=self.kwargs['pk'])
-        return queryset
     
     def form_valid(self, form):
         form.save(commit=False, car_listing=CarInfo.objects.get(id=self.kwargs['pk']))

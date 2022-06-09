@@ -1,6 +1,5 @@
 from django.contrib import admin
 from django.urls import path, include
-from sales import views as sale_views
 from base import views as base_views
 
 urlpatterns = [
@@ -16,6 +15,7 @@ urlpatterns = [
     # path("signup/", base_views.signup, name="signup"),
     path("signup/", base_views.SignupView.as_view(), name="signup"),
     
+
     # sales urls
     path("", include("sales.urls", namespace="")),
 ]

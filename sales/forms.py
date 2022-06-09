@@ -1,6 +1,5 @@
 from django import forms
 from .models import CarInfo, CarSaleRecord
-from django.contrib.auth.models import User
 from django.core.mail import send_mail
 
 
@@ -45,12 +44,6 @@ class BuyCarForm(forms.ModelForm):
         sets the current car_info record's status as booked. sets a reference to the car_info record to the sale_record
         Sends a mail to the admin regarding the new buy request for this listing.
         """
-        breakpoint()
-        # car_listing = super().save(commit)
-        # car_listing.owner = kwargs["user"]
-        # car_listing.commission = car_listing.price * (car_listing.commission_rate / 100)
-        # car_listing.save()
-
         sale_record = super().save(commit)
         car_listing = kwargs["car_listing"]
         sale_record.car_listing = car_listing
@@ -68,7 +61,7 @@ class BuyCarForm(forms.ModelForm):
 
         #     The buyer is: {sale_record.name} (phone: {sale_record.mobile}).
 
-        #     Your commission will be: $ {car_listing.commission} at the rate of {car_listing.commission_rate}.
+        #     Your commission will be: $ {car_listing.commission} at the rate of {car_listing.commission_rate}%.
 
         #     Net transferrable amount to the seller is: ${car_listing.price - car_listing.commission}
 

@@ -2,24 +2,41 @@ from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin
 from django.shortcuts import redirect, HttpResponse
 from django.contrib.auth.models import Permission
 from rest_framework import permissions
+from .models import CarInfo
 
 
-class SuperUserRequired(LoginRequiredMixin, UserPassesTestMixin):
+
+class SuperUserRequiredMixin(UserPassesTestMixin):
     def test_func(self):
-        breakpoint()
+        print("inside: test_func")
         return self.request.user.is_superuser
 
     def handle_no_permission(self):
-        breakpoint()
+        # breakpoint()
+        print("inside: no_perm of superuser")
         return HttpResponse("You are not a super user. Please login as one to make cars available")
 
 
 
-# class SuperUserRequired(LoginRequiredMixin, UserPassesTestMixin):
-#     def test_func(self):
-#         return self.request.user.is_superuser
 
-#     def handle_no_permission(self):
+class CarAvailabilityRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
+    def test_func(self):
+        print("\n\n\n\n",CarInfo.objects.get(id=self.kwargs["pk"]).status == "available","\n\n\n\n")
+        breakpoint()
+        return CarInfo.objects.get(id=self.kwargs["pk"]).status == "available"
 
-#         return HttpResponse("You are not a super user. Please login as one to make cars available")
+    def handle_no_permission(self):
+        return HttpResponse("This car is no longer available")
+
+
+class NotOwnCarMixin(LoginRequiredMixin, UserPassesTestMixin):
+    def test_func(self):
+        print("\n\n\n\n",CarInfo.objects.get(id=self.kwargs["pk"]).status == "available","\n\n\n\n")
+        # return CarAvailabilityRequiredMixin.test_func(self) and not CarInfo.objects.get(id=self.kwargs["pk"]).owner == self.request.user
+        return not CarInfo.objects.get(id=self.kwargs["pk"]).owner == self.request.user
+
+    def handle_no_permission(self):
+        return HttpResponse("This is your own car, baka.")
+
+
 
