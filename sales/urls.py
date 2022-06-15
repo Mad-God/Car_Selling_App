@@ -20,4 +20,9 @@ urlpatterns = [
     ),
     # path("finalise-sale/<int:pk>", views.finalise_sale, name="finalise-sale"),
     path("finalise-sale/<int:pk>", views.FinaliseSale.as_view(), name="finalise-sale"),
+    
+    # celery urls
+    path("celery-test", views.celery_view, name="celery-test"),
+    path("timed-mail", views.timed_mail, name="timed-mail"),
+
 ]

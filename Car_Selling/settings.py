@@ -37,10 +37,15 @@ INSTALLED_APPS = [
     # 3rd party apps
     'crispy_forms',
     'crispy_tailwind',
+    "django_celery_results",
+    "django_celery_beat",
+
+      
 
     # custom apps
     "sales",
     "base",
+    "celery_app", 
 ]
 
 MIDDLEWARE = [
@@ -143,3 +148,18 @@ EMAIL_HOST = str(env("EMAIL_HOST"))
 EMAIL_HOST_USER = str(env("EMAIL_HOST_USER"))
 EMAIL_HOST_PASSWORD = str(env("EMAIL_HOST_PASSWORD"))
 EMAIL_BACKEND = str(env("EMAIL_BACKEND"))
+
+# CELERY SETTINGS:
+
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379'
+CELERY_ACCEPT_CONTENT = ["applicaion/json"]
+CELERY_RESULT_SERIALIZER = "json"   
+CELERY_TASK_SERIALIZER = "json"
+CELERY_TIMEZONE = "Asia/Kolkata"
+CELERY_ACCEPT_CONTENT = ['json','application/text']
+CELERY_RESULT_BACKEND = "django-db"
+
+
+# Celery Beat Scheduler
+
+CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"

@@ -6,13 +6,15 @@ from django.contrib.auth.decorators import login_required
 from .decorators import superuser_required, car_availability_required, not_own_car
 from django.core.paginator import Paginator
 from django.db.models import Sum
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.views import View
 from django.views.generic import ListView, CreateView
 from django.shortcuts import redirect, reverse
 from .mixins import CarAvailabilityRequiredMixin, NotOwnCarMixin, SuperUserRequiredMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
-
+from .tasks import test_func
+from django_celery_beat.models import PeriodicTask, CrontabSchedule
+import json
 # Create your views here.
 
 
@@ -197,4 +199,27 @@ class BuyCar(CarAvailabilityRequiredMixin, NotOwnCarMixin, CreateView):
         )
         return context
 
+
+def celery_view(request):
+    test_func.delay()
+    return HttpResponse("Done in the view. Check celery terminal.")
+
+
+def timed_mail(request):
+    if request.method == "GET":
+        hour = request.GET.get("hour", -1)
+        minute = request.GET.get("minute", -1)
+        flag=0
+        breakpoint()
+        if flag==1:
+            return HttpResponse("mail has been scheduled")
+        
+        if hour != -1 and minute != -1:
+            schedule, created = CrontabSchedule.objects.get_or_create(hour =hour, minute=minute)
+            # use unique name for the periodic tasks
+            task = PeriodicTask.objects.create(crontab=schedule, name="timed_mail_7", task="sales.tasks.send_promoitonal_mails", args=json.dumps((2,3)))
+            return HttpResponse("mail has been scheduled")
+        # else:
+        #     return HttpResponse("INvalid form values")
+    return render(request,"sales/timed-mail.html", context={})
 

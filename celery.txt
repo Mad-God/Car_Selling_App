@@ -1,0 +1,150 @@
+django main task: handle requests and responses
+
+if we have a request that is performing a time taking task, then the response will take a long time to get tot the user.
+
+Celery utilises multiple parallel processing cores to process diffrent time taking process simultaneously.
+
+Celery working:
+    django gets time consuming request;
+    dj allocates the task to celery;
+
+    celery broker (redis, rabbitMQ, Amazon SQS) recieves the task from django
+     broker has a queue that follows FIFO pattern for the task's scheduling;
+     broker also has a number of workers same as  number of cores
+
+    results stores: 
+        after the task is done, the celery worker will store the results in some way, for this purpose
+         we have tools like AMQP, Redis, memchad, django orm, Elasticsearch, MongoDb, File Systems
+ 
+    serializations:
+        when a task is allocated to celery, a lot of metadata is also sent. 
+        All this data needs to be stored in a well strutured format, so celery uses serializers for this purpose like YAML, json, pickle etc
+
+
+    celery beat:
+        it is a task scheduler used for Scheduling a task for a time in future:
+            by the coder                
+            by the admin
+        
+        the tasks are stored in the celery beat and when their time comes, the celery beat 
+        sends these tasks to the celery broker.
+    
+
+
+Why use celery:
+    3rd party API calls
+    CPU intensive tasks
+    periodic/scheduled tasks
+    faster server fuctioning
+ 
+
+
+Diffrent modules of Celery:
+    celery:
+        manage and allocate the tasks to the celery workers
+
+    django celery beat:
+        periodic/scheduled tasks
+
+    django celery results:
+        stores all the celery results and sends them to the DB when queried.
+
+
+
+
+Celery workers and scaling our projects:
+       when a worker starts, the worker spawns multiple threads or child processes and deals with all the book keeping stuff
+        These child processes will perform the actual task that is assigned to the worker,
+        and the worker only monitors the child processes. This increases concurrency and 
+        decreses time taken by worker by utilising parallel procesing of the tasks assigned to worker
+        These child processes are aka Execution Pools.
+
+        The size of the child pool, i.e number of child processes determine how many tasks a worker can perform simultaneously
+        This default number of child processes spawned by Worker = on number of cores in the CPU.
+
+    Concurrency:
+        it is an extra attribute that decides the size of the pool
+    
+
+    Types of pools:
+        prefork[default]: multiprocessing
+        solo: no child processes, worker does the processing itself  
+        thred: multithreading
+
+
+
+
+        
+Celery commmands:
+    start celery beat:
+        celery -A Car_Selling beat -l info
+    
+    start celery worker:
+        celery -A Car_Selling.celery worker --pool=solo -l info
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celery video 1 (basic setup of celery):
+    
+    basic setup of celery worker:
+
+        start new project
+        pip install celery
+        pip install django-celery-results
+        
+        add django_celery_results in installed apps[]
+
+        setting.py file configuration for celery broker url(redis url), accept content, serializer, task, timezone, resulats backend
+
+        install redis
+
+        create a celery.py in project folder
+            set environment configuration settings
+            instanciate celery object for project
+            set timezone
+            set auto discover tasks
+            create a debug_taks function that prints all the discovered requests
+
+        create a dummy app
+        
+        create a tasks.py file in the application
+            create a shared_task decorated function in tasks.py
+        
+        make a view and url that calls this task using func.delay()
+
+        migrate
+
+
+        in the __init__.py file of projecct folder,
+            __all__ = ("celery_app",)
+
+        run the celery working in a new terminal
+            celery -A Car_Selling.celery worker --pool=solo -l info
+
+
+
+    celery beat setup:
+        pip install django-celery-beat
+        add django_celery_beat to installed apps
+        migrate
+        configure celery beat configurations in settings like scheduler
+
+        run celery beat in a new terminal
+            celery -A Car_Selling celery -l info
+
+
+Celery video 3 (sending emails with celery):
+    create a tasks.py in an app folder
+
+    creating dynamic tasks:
+        done using django ORM

@@ -1,0 +1,22 @@
+{% extends "base.html" %} {% load tailwind_filters %} {% block content %}
+<div class="max-w-lg mx-auto">
+    <h1>Enter the Minutes and hour for the mailing time.
+    </h1>
+
+{% comment %} the filter strip {% endcomment %}
+    <div class = "w-100 px-4 mx-4 bg-gray-400 rounded px-4 py-4 flex">
+        <form method = "GET" action="{% url 'sales:timed-mail' %}">
+           <label for="minute_id" class = "px-2 py-2 my-2 mx-2">Minutes:</label>
+           <input id="minute_id" class = "px-2 py-2 my-2 mx-2" name="hour" style = "width:180px" />
+           <br>
+           <label for="hour_id" class = "px-2 py-2 my-2 mx-2">Hours:</label>
+           <input id="hour_id" name="minute"  class = "px-2 py-2 my-2 mx-2" style = "width:180px" />
+            <button
+                class="w-full bg-blue-500 hover:bg-blue-600 px-3 py-1 rounded-md"
+                type="submit"
+                >
+                Submit
+            </button>  
+    </div>
+</div>
+{% endblock %}
