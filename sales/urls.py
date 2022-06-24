@@ -1,6 +1,8 @@
 from django.contrib import admin
 from django.urls import path
 from . import views
+# from rest_framework.urlpatterns import format_suffix_patterns
+
 
 
 app_name = "sales"
@@ -25,4 +27,15 @@ urlpatterns = [
     path("celery-test", views.celery_view, name="celery-test"),
     path("timed-mail", views.timed_mail, name="timed-mail"),
 
+    # DRF urls
+    path("api-root/", views.api_root, name="api-root"),
+    path("api-list", views.CarInfoList.as_view(), name="api-list"),
+    # path("api-list", views.car_info_list, name="api-list"),
+    path("api-detail/<int:pk>", views.CarInfoDetail.as_view(), name="api-detail"),
+    # path("api-detail/<int:pk>", views.car_info_detail, name="api-detail"),
 ]
+
+
+# we are adding this so that our application can handle any format's request,
+#  as we are no longer working with single type of data, instead json, api etc.
+# urlpatterns = format_suffix_patterns(urlpatterns)

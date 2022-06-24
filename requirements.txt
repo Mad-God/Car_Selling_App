@@ -9,3 +9,7 @@ black
 celery
 redis
 django-celery-results
+djangorestframework
+markdown
+django-filter
+djangorestframework-simplejwt

@@ -6,15 +6,36 @@ from django.contrib.auth.decorators import login_required
 from .decorators import superuser_required, car_availability_required, not_own_car
 from django.core.paginator import Paginator
 from django.db.models import Sum
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from django.views import View
 from django.views.generic import ListView, CreateView
 from django.shortcuts import redirect, reverse
 from .mixins import CarAvailabilityRequiredMixin, NotOwnCarMixin, SuperUserRequiredMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .tasks import test_func
+from .tasks import test_func, test_func2, test_func3
 from django_celery_beat.models import PeriodicTask, CrontabSchedule
 import json
+from rest_framework.authentication import TokenAuthentication
+
+# -------- DRF imports ---------------
+from django.views.decorators.csrf import csrf_exempt
+from rest_framework.parsers import JSONParser
+from sales.serializers import CarInfoSerializer
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.response import Response
+from rest_framework import permissions
+from rest_framework import generics
+from rest_framework_simplejwt.authentication import JWTAuthentication
+
+
+from .models import CarInfo
+from .serializers import CarInfoSerializer
+from django.http import Http404
+from rest_framework.views import APIView
+from rest_framework import status
+from sales.permissions import IsOwnerOrReadOnly
+
+from sales import mixins
 # Create your views here.
 
 
@@ -201,25 +222,169 @@ class BuyCar(CarAvailabilityRequiredMixin, NotOwnCarMixin, CreateView):
 
 
 def celery_view(request):
-    test_func.delay()
-    return HttpResponse("Done in the view. Check celery terminal.")
+    # normal apllication of the task
+    # test_func2.delay(2,3)
 
+    # linked application
+    # x = test_func2.apply_async(kwargs={'a':3, 'b':4}, link=test_func2.si(1,2))
 
+    # subtasked tasks
+    x = test_func3.delay(a=1,b=3)
+    # breakpoint()
+    print(x.get())
+
+    return HttpResponse("Done in the view. Check celery terminal. News.")
+
+@superuser_required
 def timed_mail(request):
     if request.method == "GET":
         hour = request.GET.get("hour", -1)
         minute = request.GET.get("minute", -1)
         flag=0
-        breakpoint()
+        # breakpoint()
         if flag==1:
             return HttpResponse("mail has been scheduled")
         
         if hour != -1 and minute != -1:
             schedule, created = CrontabSchedule.objects.get_or_create(hour =hour, minute=minute)
             # use unique name for the periodic tasks
-            task = PeriodicTask.objects.create(crontab=schedule, name="timed_mail_7", task="sales.tasks.send_promoitonal_mails", args=json.dumps((2,3)))
+            task = PeriodicTask.objects.create(crontab=schedule, name=f"timed_mail_{hour}_{minute}", task="sales.tasks.schedule_mails", args=json.dumps((request.GET.get("subject", "No Subject"), request.GET.get("content", "No Content"))))
             return HttpResponse("mail has been scheduled")
         # else:
         #     return HttpResponse("INvalid form values")
     return render(request,"sales/timed-mail.html", context={})
 
+
+
+# ----------------- DRF VIEWS -----------
+
+# --------- Serializer dummy views -----------
+
+@csrf_exempt
+@api_view(["GET", "POST"])
+@permission_classes((permissions.AllowAny,))
+def car_info_list(request):
+    """
+    List all car listings, or create a new listing.
+    """
+    if request.method == 'GET':
+        snippets = CarInfo.objects.all()
+        serializer = CarInfoSerializer(snippets, many=True)
+        # return JsonResponse(serializer.data, safe=False)
+        return Response(serializer.data)
+
+    elif request.method == 'POST':
+        breakpoint()
+        data = JSONParser().parse(request)
+        serializer = CarInfoSerializer(data=data)
+        if serializer.is_valid():
+            breakpoint()
+            serializer.save()
+            # return JsonResponse(serializer.data, status=201)
+            return Response(serializer.data, status=201)
+            # return JsonResponse(serializer.errors, status=400)
+        breakpoint()
+        return Response(serializer.errors, status=400)
+
+
+
+@csrf_exempt
+@api_view(["GET", "POST", "PUT", "DELETE"])
+@permission_classes((permissions.AllowAny,))
+def car_info_detail(request, pk):
+
+    """
+    Retrieve, update or delete a code snippet.
+    """
+    try:
+        snippet = CarInfo.objects.get(pk=pk)
+    except CarInfo.DoesNotExist:
+        return HttpResponse("asdadsads  ")
+
+    if request.method == 'GET':
+        serializer = CarInfoSerializer(snippet)
+        return Response(serializer.data)
+        # return JsonResponse(serializer.data)
+
+    elif request.method == 'PUT':
+        data = JSONParser().parse(request)
+        serializer = CarInfoSerializer(snippet, data=data)
+        if serializer.is_valid():
+            serializer.save()
+            print("came here\n\n")
+            # return Response(serializer.data)
+            # breakpoint()
+            # return redirect("sales:api-detail",pk=serializer._args[0].id)
+            return redirect("sales:api-detail",pk=snippet.id)
+            # return JsonResponse(serializer.data)
+        return Response(serializer.errors, status=400)
+        # return JsonResponse(serializer.errors, status=400)
+    elif request.method == 'POST':
+        print("in PSOT")
+        breakpoint()
+        data = JSONParser().parse(request)
+        serializer = CarInfoSerializer(snippet, data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+            # return JsonResponse(serializer.data)
+        return Response(serializer.errors, status=400)
+        # return JsonResponse(serializer.errors, status=400)
+
+    elif request.method == 'DELETE':
+
+        snippet.delete()
+        return HttpResponse(status=204)
+
+
+
+
+# ------------- CLASS BASED API VIEWS ------------------
+
+
+class CarInfoList(generics.ListCreateAPIView):
+    """
+    List all snippets, or create a new snippet.
+    """
+    # permission_classes=[permissions.IsAuthenticatedOrReadOnly]
+    permission_classes=[permissions.IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+    serializer_class = CarInfoSerializer
+    queryset = CarInfo.objects.all()
+
+    # def get(self,*args, **kwargs):
+    #     breakpoint()
+    #     return super.get(self, args, kwargs)
+    # def get(self, request, format=None):
+    #     carinfo = CarInfo.objects.all()
+    #     serializer = CarInfoSerializer(carinfo, many=True)
+    #     return Response(serializer.data)
+
+    # def post(self, request, format=None):
+    #     serializer = CarInfoSerializer(data=request.data)
+    #     if serializer.is_valid():
+    #         serializer.save()
+    #         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+class CarInfoDetail(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes=[IsOwnerOrReadOnly]
+    queryset = CarInfo.objects.all()
+    serializer_class = CarInfoSerializer
+
+
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework.reverse import reverse
+
+
+@api_view(['GET',"POST"])
+@permission_classes([permissions.AllowAny])
+def api_root(request, format=None):
+    breakpoint()
+    return Response({
+        'users': reverse('sales:api-list', request=request, format=format),
+        # 'snippets': reverse('sales:user-list', request=request, format=format)
+    })

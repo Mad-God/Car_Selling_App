@@ -1,0 +1,297 @@
+DJANGO VS DRF:
+
+    DRF is a library on top of Django. (dependency)
+
+    Django can do everything DRF can but would require more lines of code
+
+    DRF is a microframework whereas Django Full Stack Framework
+
+
+
+
+DRF Overview:
+    serialisation:
+        -> create a model
+
+        For web APIs, we need a way to serialise and deserialise
+         the snippet instances into representation such as JSON.
+        We can do this using serialisers that work in a similar
+         fashion  than django forms.
+        
+        -> create a serilisers.py in the application folder
+        -> from rest_framework import serializers
+        -> from .models import ModelName
+
+        -> class SeriliserName(serializers.Serialzer):
+            # feild here
+
+            def create(self, instance, validated_data):
+                # whatever
+            
+            def update(self, instance, validated_data):
+                # whatever
+        
+
+
+        serialisation:
+            serializer = SerilizerName(ModelName.objects.get(id=1))
+            or 
+            serializer = SerilizerName(feild1=val1, feild2=val2 ...)
+            .data to get the data of a particular serialised instance
+            JSONRenderer().render(serializer.data) to render the data in JSON format
+            
+            we can serialize querysets instead of instances,
+                serialzier = SeriliserName(ModelName.objects.all(), many=True)
+
+
+        deserialisation:
+            get the data in a "content" object, 
+
+            parse the data in native python
+                import io
+                stream=io.ByteIO(content)
+                data =JSONParser().parse(stream)
+            
+            restore native datatypes:
+                serializer = SnippetSerializer(data=data)
+                serializer.is_valid() # check for valid data
+                serializer.validated_data() # get the valid data contents
+                serializer.save()
+
+        
+        Model Serializer:
+            class SnippetSerializer(serializers.ModelSerializer):
+                class Meta:
+                    model = Snippet
+                    fields = ['id', 'title', 'code', 'linenos', 'language', 'style']
+            
+
+            -> print detail of all the fields using repr(serializer)
+
+            ModelSerializers have default implementation of create() and update() methods
+
+
+    Using Serializers in Views:
+        import the model, serializer, HttpResponse, JsonResponse, JSONParser, csrf_exempt
+
+    For a list view of all model instances
+        @csrf_exempt
+        def snippet_list(request):
+            """
+            List all code snippets, or create a new snippet.
+            """
+            if request.method == 'GET':
+                snippets = Snippet.objects.all()
+                serializer = SnippetSerializer(snippets, many=True)
+                return JsonResponse(serializer.data, safe=False)
+
+            elif request.method == 'POST':
+                data = JSONParser().parse(request)
+                serializer = SnippetSerializer(data=data)
+                if serializer.is_valid():
+                    serializer.save()
+                    return JsonResponse(serializer.data, status=201)
+                return JsonResponse(serializer.errors, status=400)
+
+
+
+
+
+----------------- 20 June -----------
+
+needed to use the permission_classes in the FBV in car_list api view becuase we have set DRF permissions as django permissions which requires that we
+ define a queryset object for each view. To bypass this, we need to specify that any permission can view this view
+
+
+----------- REQUEST RESPONSE ------------
+
+we update are urls to handle multiplpe types of requested data formats
+
+
+
+------------ Class Based Views ---------------
+
+
+
+
+-------------- SHORT NOTES -------------
+    serialization deserialization:
+        create a model
+
+        create a serilizer class extending serializer.Serializer
+            declare fields' datatype as class attributes
+            define create and update methods
+
+        or a ModelSerializer:
+            subclass the serializer.ModelSerializer class
+
+            define the Meta class containing the model and fields attributes
+
+
+        write a view to use the serializer:
+            if GET:
+                get all model instances
+                serialize the queryset
+                return JsonResponse or Response with serializer.data and safe=True
+            if POST:
+                serialize the data
+                if serializer.is_valid:
+                    save
+        
+    Request and Response:
+        function based views:
+            decorate  with api_view
+
+            return a Reponse instead of JsonResponse
+
+        you can also make the request compatible with multiple format requests using format_suffix_patterns
+        
+    
+    Class Based Views:
+        create a class extending APIView class
+            define get_object(), put(), get(), delete() and post() methods that return a Response
+        
+        or create a class extending generics.GenericAPIView and mixins like ListModelMixin, CreateModelMixin classes
+            set queryset, serializer_class attribute
+            define the get and post methods which simply return the value of self.list() or self.create() methods from the mixins that we extended
+        
+        or create a class extending generic classes like generics.ListCreateAPIView or generics.RetrieveUpdateDestroyAPIView
+            set the queryset and serializer_class attributes
+        
+
+    Authentication and authorizations
+
+
+------------ 22 June AUTHENTICATION DOCS ------------
+AUTHENTICATION
+Authentication
+    occurs at the very start, even before permissions
+    associate request w credentials like user or credentials
+    then permissions and throttiling decide to allow request or not
+
+How authentication is determined
+    they are determined as list of classes
+    if no class authenticates, req.user is Anonymous and req.auth is None.
+     We can overwrite these default values too
+
+Setting the authentication scheme
+    the global authentication scheme classes are determined in the settings.REST_FRAMEWORK.DEFAULT_AUTHENTICATION_CLASSES
+    you can also set per-view authentication classes 
+    in APIView based views using the authentication_classes attribute
+    or in @api_view decorator using @authentication_classes([]) decorator
+
+Unauthorized and Forbidden responses
+    401 is for unauthorised requests where a www-Authenticate header is sent to req.user on how to authenticate.
+        There can be many ways to authenticate but the www-headder contains the instruction determined in the
+         first authentication class that is determined on the authentication clases
+    
+    
+
+
+
+API REFERENCES
+BasicAuthentication
+    authenticates aginst the username and password
+    not very safe
+    provides the req.user and req.auth
+    when using this, should ensure that API is available only over HTTPS and the user id passwords are not stored
+
+TokenAuthentication
+    token-based authentication scheme
+    appropriate for client server setups
+    to use this:
+        INSTALLED_APPS must include rest_framework.authtoken
+        
+        then Authentication classes[] must include TokenAuthentication class in the rest_framework_settings
+        or you can add the TokenAuthentication class to authentication_classes[] attribute of APIView classes for per_view authentication.
+
+        run manage.py migrate 
+    
+    When succesfully authenticated, TokenAuthentication returns:
+        req.user as the current User,
+        req.auth as an instance of rest_framework.authtoken.models.Token;
+    
+    Generating Token:   
+        you'll need to create tokens for your Users, there are 3 way to do it:
+            create a post_save signal for whenver a User is created, an associated token is also created
+             and in case you already have some users created, 
+             use the Token.objects.get_or_create(user=user) for all user instances in the shell to create their token manually.
+    
+    Using the token when calling API:
+        when calling the API that authenticates using the TokenAuthentication class,
+            in the header section, add an "Authorization" key and set the value as the generated token current of the current user, prefixed by 'token '.
+
+    
+SessionAuthentication
+    uses django default session backend for authentication
+    used for AJAX clients running in the same environment as your application
+    on authentication, provides the req.user as User, req.auth as None
+    while using this, must ensure to CSRF tokens in all unsafe HTTP method calls
+
+RemoteUserAuthentication
+    allows you to delegate authentication to your web server (like Apache or Nginx, which sets the REMOTE_USER environment variable
+
+Custom authentication
+    to implment custom authentication, we need to create a class sub=classing 
+        rest_framework.authentication.BaseAuthentication class 
+        and overwrite the authenticate(self, request) method in it. In this method,
+            return None if authentication is not requested;
+            raise AuthenticationFailed if authentication requested and failed, no other Authentication schemes will be checked thereafter
+        
+        You can also override authenticate_header(self, request) to customize the WWW-Authenticate header string for 401 Unauthorised result.
+            
+
+
+
+
+Third party packages
+django-rest-knox
+Django OAuth Toolkit
+Django REST framework OAuth
+
+
+JSON Web Token Authentication
+    why Token Authentication isn't enough:
+        the token generation is fairly simple without the use of many sophisticated algorithms
+        the token generated is permanent so once a token is leaked, it can be used whenevr by anyone to access the site.
+    
+    profits of JWT Authentication:
+        more complex token generation algorithm
+        the token expires at regular intervals
+    
+    setup for jwt auth:
+        pip install djangorestframework-simplejwt
+        put in the template url mapping in urls.py from the docs
+        go to the specified url to generate a JWT oken for the current user
+        use this token when accessing the authenticated view for authorization
+    
+    getting the access tokens:
+        send a POST request to the TokenObtain view endpoint with your username and password
+            this returns an access token and a refresh token
+        Once the access token expires, use the refresh token on the TokenRefresh view endpoint to get another access token
+
+
+    using the token:
+        when calling a authentication protected view, in the authorization section, set it as bearer authorization and set the token value
+
+    settings in jwt:
+        access_token_lifetime: access token lifetime
+
+        refresh_token_lifetime: refresh token lifetime
+
+        rotate_refresh_tokens: 
+
+
+Hawk HTTP Authentication
+HTTP Signature Authentication
+Djoser
+django-rest-auth / dj-rest-auth
+drf-social-oauth2
+drfpasswordless
+django-rest-authemail
+Django-Rest-Durin
+
+
+
+
+ 
